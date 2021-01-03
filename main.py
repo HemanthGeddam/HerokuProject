@@ -51,13 +51,48 @@ class customerdata(Base):
     Enddate = Column("enddate", Date)
     Productenquerycount = Column("productenquerycount", Integer)
     Productpurchasedcount = Column("productpurchasedcount", Integer)
-    Productbuystatus = Column("productbuystatus", Integer)
+    Productbuystatus = Column("productbuystatus", String)
 
 #create session class
 Session = sessionmaker(bind=engine)
 
 #configure log-level:- available log levels are : INFO, WARNING, DEBUG, ERROR, CRITICAL.
 logging.basicConfig(level="DEBUG")
+
+# Post Method - Post the lead info
+@app.route('/postleadinfo', methods=['POST'])
+def home_post():
+    session = Session()
+    request_body = request.get_json(force=True)
+    for index,item in enumerate(request_body):
+        record = customerdata(CustomerName = item["customername"],
+                                     Gender = item["gender"],
+                                     Age = item["age"],
+                                     Occupation =item["occupation"],
+				                     MobileNo = item["mobileno"],
+                                     Email = item["email"],
+                                     VechicleModel =item["vechiclemodel"],
+				                     CustomerState = item["customerstate"],
+                                     CustomerDistrict = item["customerdistrict"],
+                                     CustomerCity =item["customercity"],
+				                     CustomerExistingVehicle = item["customerexistingvehicle"],
+                                     DealerState = item["dealerstate"],
+                                     DealerTown =item["dealertown"],
+                                     DealerName = item["dealername"],
+                                     BriefAboutEnquiry = item["briefaboutenquiry"],
+                                     ExpectedDateofPurchase =item["expecteddateofpurchase"],
+				                     IntendedUsage = item["intendedusage"],
+                                     Senttodealer = item["senttodealer"],
+                                     DealerCode =item["dealercode"],
+                                     Comments = item["commentss"],
+                                     Startdate = item["startdate"],
+                                     Enddate = item["enddate"],
+				                     Productenquerycount = item["productenquerycount"],
+                                     Productpurchasedcount = item["productpurchasedcount"],
+                                     Productbuystatus =item["productbuystatus"])
+        session.add_all([record])
+    session.commit()
+    return ("data inserted in PersonalInfo table successfully")
 
 # Get Method - Retrieves all lead info
 @app.route('/allleadinfo', methods=['GET'])
@@ -113,13 +148,34 @@ def home_put():
     finally:
         session.close()
 
+#Update single with PATCH method
+@app.route('/updatesinglefield', methods=['PATCH'])
+def home_patch():
+    session = Session()
+    logging.info("This function will update single field of a lead")
+    print("parameter is {}". format(request.args))
+    Mobile_Number = request.args.get("mobileno")
+    request_body = request.get_json(force=True)
+    try:
+        result = session.query(customerdata).filter(customerdata.Senttodealer == "True",
+                                                           customerdata.MobileNo == Mobile_Number)\
+        .update({customerdata.Comments : request_body[0]["commentss"]})
+
+        session.commit()
+        logging.info("update status: 0 - update unsuccessful, 1 - update successful")
+        logging.debug("Your updated lead record status is: {}".format(result))
+        logging.warning("Verify update lead status in database")
+        return str(result)
+    finally:
+        session.close()
+
 # Delete Method - Deletes particular lead info from database
 @app.route('/delsinglerecord',methods = ['DELETE'])
 def home_del():
     session = Session()
-    buy_status = request.args.get("productbuystatus")
+    Mobile_Number = request.args.get("mobileno")
     try:
-        result = session.query(customerdata).filter(customerdata.Productbuystatus == buy_status).delete()
+        result = session.query(customerdata).filter(customerdata.MobileNo == Mobile_Number).delete()
         session.commit()
         logging.info("update status: 0 - update unsuccessful, 1 - update successful")
         logging.debug("Deleted lead record status is: {}".format(result))
