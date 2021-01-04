@@ -16,7 +16,7 @@ api = Api(app)
 Base  = declarative_base()
 
 #Constructed database URL to access database:
-database_url= "postgres://ywroswyaowavtn:c1738bf47f6715af21dbbce701df5a117c6fff04993f26851fef3ba8a83765a8@ec2-34-196-34-158.compute-1.amazonaws.com:5432/d55hl6ii1kctej"
+database_url= "postgres://fiquqviuhjqkdc:3a9d1f46254ec48ef17b406fd1be83e299335be850d3a07ef944678aaa25d3f8@ec2-3-215-40-176.compute-1.amazonaws.com:5432/d4upal71s559o1"
 
 #disable sqlalchemy pool using nullpool as by default postgress has its own pool
 engine = create_engine(database_url,echo=True, poolclass=NullPool)
